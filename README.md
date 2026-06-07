@@ -132,4 +132,225 @@ El código actual funciona pero presenta múltiples problemas de diseño que dif
 3. **Alto acoplamiento** (God Class con múltiples responsabilidades)
 4. **Tests de integración** sin cobertura unitaria
 
-**Próximo paso**: Diseño TO-BE con polimorfismo y separación de responsabilidades.
+---
+
+# Diseño TO-BE - Solución con Polimorfismo
+
+## UML de Clases TO-BE
+
+![UML TO-BE](Analisis%20UML%20-%20TO%20BE.png)
+
+---
+
+## Arquitectura del Diseño
+
+### Separación de Responsabilidades
+
+**FormaGeometrica (abstracta)**:
+- Responsabilidad única: Cálculo geométrico
+- Métodos abstractos: `CalcularArea()`, `CalcularPerimetro()`
+- Sin conocimiento de formateo, idiomas o presentación
+
+**Formas Concretas** (4):
+- `Cuadrado(decimal lado)`
+- `Circulo(decimal radio)`
+- `Triangulo(decimal lado)`
+- `Trapecio(decimal baseInferior, decimal altura)` - Isósceles simplificado
+
+**ReporteFormateador**:
+- Responsabilidad única: Generación de reportes HTML
+- Usa `Traductor` para multiidioma
+- Sin lógica de cálculo geométrico
+
+**Traductor**:
+- Responsabilidad única: Traducción multiidioma
+- Maneja castellano, inglés, italiano
+- Fallback a clave original si no encuentra traducción
+
+**Idioma (enum)**:
+- Type-safe: Castellano, Ingles, Italiano
+- Reemplaza magic numbers (int 1, 2)
+
+---
+
+## Aplicación de Principios SOLID
+
+### Single Responsibility Principle (SRP) ✅
+Cada clase tiene una sola razón para cambiar:
+- Formas: Solo si cambia fórmula matemática
+- ReporteFormateador: Solo si cambia formato de reporte
+- Traductor: Solo si cambia estrategia de traducción
+
+### Open/Closed Principle (OCP) ✅
+Abierto a extensión, cerrado a modificación:
+- **Agregar nueva forma**: Crear clase nueva, heredar de `FormaGeometrica`
+- **Agregar nuevo idioma**: Agregar valor al enum, actualizar resources
+- **NO modificar**: Clases existentes, switches, ifs por tipo
+
+### Dependency Inversion Principle (DIP) ✅
+`ReporteFormateador` depende de abstracción (`Traductor`), no implementación concreta.
+
+---
+
+## OCL TO-BE - Restricciones Formales
+
+### Constructores de Formas
+
+```ocl
+-- Cuadrado
+context Cuadrado::Cuadrado(lado: Decimal)
+  pre ladoPositivo:
+    lado > 0
+
+  post ladoAsignado:
+    self.lado = lado
+
+-- Circulo
+context Circulo::Circulo(radio: Decimal)
+  pre radioPositivo:
+    radio > 0
+
+  post radioAsignado:
+    self.radio = radio
+
+-- Triangulo
+context Triangulo::Triangulo(lado: Decimal)
+  pre ladoPositivo:
+    lado > 0
+
+  post ladoAsignado:
+    self.lado = lado
+
+-- Trapecio (Isósceles simplificado)
+context Trapecio::Trapecio(baseInferior: Decimal, altura: Decimal)
+  pre valoresPositivos:
+    baseInferior > 0 and altura > 0
+
+  pre relacionGeometrica:
+    baseInferior > altura
+
+  post baseAsignada:
+    self.baseInferior = baseInferior
+
+  post alturaAsignada:
+    self.altura = altura
+```
+
+---
+
+### Traductor
+
+```ocl
+context Traductor::Traducir(clave: String, idioma: Idioma) : String
+  pre claveNoNullNiVacia:
+    clave <> null and clave.size() > 0
+
+  pre idiomaValido:
+    idioma in {Idioma::Castellano, Idioma::Ingles, Idioma::Italiano}
+
+  post siempreDevuelveValor:
+    result <> null and result <> ''
+
+  post fallbackAClave:
+    -- Si no encuentra traducción, devuelve clave original
+    not traduccionEncontrada implies result = clave
+
+context Traductor::TraducirForma(nombreForma: String, cantidad: Integer, idioma: Idioma) : String
+  pre nombreNoNullNiVacio:
+    nombreForma <> null and nombreForma.size() > 0
+
+  pre cantidadNoNegativa:
+    cantidad >= 0
+
+  pre idiomaValido:
+    idioma in {Idioma::Castellano, Idioma::Ingles, Idioma::Italiano}
+
+  post siempreDevuelveValor:
+    result <> null and result.size() > 0
+
+  post pluralizacionCorrecta:
+    (cantidad = 1 implies result.esSingular()) and
+    (cantidad <> 1 implies result.esPlural())
+```
+
+---
+
+### ReporteFormateador
+
+```ocl
+context ReporteFormateador::ReporteFormateador(traductor: Traductor)
+  post traductorAsignado:
+    traductor = null implies (
+      self.traductor <> null and
+      -- Log: "Traductor no provisto, usando traductor por defecto"
+      true
+    )
+
+  post traductorProvisto:
+    traductor <> null implies self.traductor = traductor
+
+context ReporteFormateador::GenerarReporte(formas: List<FormaGeometrica>, idioma: Idioma) : String
+  pre formasNoNull:
+    formas <> null
+
+  pre formasVaciaValida:
+    -- Lista vacía es válida (comportamiento AS-IS mantenido)
+    true
+
+  pre idiomaValido:
+    idioma in {Idioma::Castellano, Idioma::Ingles, Idioma::Italiano}
+
+  post siempreDevuelveValor:
+    result <> null and result.size() > 0
+
+  post listaVaciaDevuelveMensaje:
+    formas.isEmpty() implies result.contains("vacía" or "empty" or "vuota")
+```
+
+---
+
+### CalcularArea y CalcularPerimetro
+
+**Sin restricciones OCL explícitas** - Confiamos en matemática:
+- Variables `readonly` validadas en constructor
+- Si lado/radio/altura > 0 → área/perímetro > 0 (garantizado matemáticamente)
+
+---
+
+## Validaciones Fail-Fast
+
+Todas las validaciones se realizan en **constructores**:
+- `ArgumentException` si parámetros inválidos (≤ 0)
+- `ArgumentNullException` si strings null/vacíos
+- `ArgumentException` si enum Idioma inválido
+
+**Ventaja**: Errores detectados inmediatamente al crear objetos, no en runtime posterior.
+
+---
+
+## Mejoras vs. AS-IS
+
+| Aspecto | AS-IS | TO-BE |
+|---------|-------|-------|
+| **Agregar forma** | Modificar 5+ lugares | Crear 1 clase nueva |
+| **Agregar idioma** | Modificar ifs distribuidos | Agregar a enum + resources |
+| **Duplicación código** | 43.1% | Eliminada (polimorfismo) |
+| **Validaciones** | Ninguna (fail-late) | Constructor (fail-fast) |
+| **Type safety** | Magic numbers (int) | Enums |
+| **Separación responsabilidades** | God Class (1 clase, 5 responsabilidades) | 3 capas (Formas, Formateo, Traducción) |
+| **Testabilidad** | Difícil (métodos estáticos) | Fácil (DI, polimorfismo) |
+
+---
+
+## BDD (Behavior-Driven Development)
+
+Los escenarios Gherkin que guían la implementación y testing se encuentran en:
+📂 **[/features/](./features/)** - Especificaciones en formato Gherkin
+
+**Metodología**: Cada escenario Gherkin → 1 test unitario NUnit (relación 1:1)
+
+---
+
+## Próximo Paso
+
+Implementación guiada por TDD basada en especificaciones Gherkin.
