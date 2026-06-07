@@ -1,5 +1,24 @@
 # README - Refactoring FormaGeometrica
 
+## Autor
+
+**Tomas Lazara** - Desarrollador Senior
+[tomafelipelazara@gmail.com](mailto:tomafelipelazara@gmail.com) | [GitHub](https://github.com/TomasLazara/Klimber)
+
+---
+
+## Enfoque Utilizado
+
+Este proyecto aplica los siguientes métodos para resolver el desafío de refactorización:
+
+- **Análisis AS-IS**: Modelado UML, OCL y diagramas de secuencia del código actual
+- **Identificación de problemas**: Análisis de violaciones de diseño y duplicación de código
+- **Diseño TO-BE**: Aplicación de polimorfismo y principios SOLID
+- **BDD (Behavior-Driven Development)**: Gherkins → Tests unitarios NUnit (1:1)
+- **Testing exhaustivo**: Tests unitarios + integración + E2E
+
+---
+
 ## Análisis del Estado Actual (AS-IS)
 
 ## 1. Diagnóstico del Problema
@@ -27,29 +46,26 @@
 ## 2. Análisis de Arquitectura
 
 ### UML de Clases AS-IS
-![UML Clases](./uml-as-is.png)
+![UML Clases](Analisis%20UML%20-%20AS%20IS.png)
 
 **Observaciones**:
 - God Class: FormaGeometrica tiene 5 responsabilidades
 - Sin interfaces ni abstracciones
 - Constantes de tipo dentro de la entidad
 
-### Diagramas de Secuencia
-![Diagramas Métodos](./secuencia-metodos-as-is.png)
-
 ---
 
 ## 3. Análisis de Métodos
 
 ### Constructor
-![Análisis Constructor](./analisis-constructor.png)
+![Análisis Constructor](Analisis%20CTOR%20-%20AS%20IS.png)
 
 **Problemas identificados**:
 - Tipo puede estar fuera de rango desde el principio (no se valida)
 - Ancho → _lado: error de nombre y sin validación de valores
 
 ### CalcularArea / CalcularPerimetro
-![Análisis Cálculos](./analisis-calculos.png)
+![Análisis Cálculos](Analisis%20Area%20&%20Perimetro%20-%20AS%20IS.png)
 
 **Problemas identificados**:
 - No valida valores de _lado
