@@ -155,7 +155,7 @@ El código actual funciona pero presenta múltiples problemas de diseño que dif
 - `Cuadrado(decimal lado)`
 - `Circulo(decimal radio)`
 - `Triangulo(decimal lado)`
-- `Trapecio(decimal baseInferior, decimal altura)` - Isósceles simplificado
+- `Trapecio(decimal baseMayor, decimal baseMenor, decimal altura)` - Isósceles
 
 **ReporteFormateador**:
 - Responsabilidad única: Generación de reportes HTML
@@ -221,16 +221,19 @@ context Triangulo::Triangulo(lado: Decimal)
   post ladoAsignado:
     self.lado = lado
 
--- Trapecio (Isósceles simplificado)
-context Trapecio::Trapecio(baseInferior: Decimal, altura: Decimal)
+-- Trapecio (Isósceles)
+context Trapecio::Trapecio(baseMayor: Decimal, baseMenor: Decimal, altura: Decimal)
   pre valoresPositivos:
-    baseInferior > 0 and altura > 0
+    baseMayor > 0 and baseMenor > 0 and altura > 0
 
-  pre relacionGeometrica:
-    baseInferior > altura
+  pre baseMayorMayorQueBaseMenor:
+    baseMayor > baseMenor
 
-  post baseAsignada:
-    self.baseInferior = baseInferior
+  post baseMayorAsignada:
+    self.baseMayor = baseMayor
+
+  post baseMenorAsignada:
+    self.baseMenor = baseMenor
 
   post alturaAsignada:
     self.altura = altura
@@ -328,20 +331,6 @@ Todas las validaciones se realizan en **constructores**:
 
 ---
 
-## Mejoras vs. AS-IS
-
-| Aspecto | AS-IS | TO-BE |
-|---------|-------|-------|
-| **Agregar forma** | Modificar 5+ lugares | Crear 1 clase nueva |
-| **Agregar idioma** | Modificar ifs distribuidos | Agregar a enum + resources |
-| **Duplicación código** | 43.1% | Eliminada (polimorfismo) |
-| **Validaciones** | Ninguna (fail-late) | Constructor (fail-fast) |
-| **Type safety** | Magic numbers (int) | Enums |
-| **Separación responsabilidades** | God Class (1 clase, 5 responsabilidades) | 3 capas (Formas, Formateo, Traducción) |
-| **Testabilidad** | Difícil (métodos estáticos) | Fácil (DI, polimorfismo) |
-
----
-
 ## BDD (Behavior-Driven Development)
 
 Los escenarios Gherkin que guían la implementación y testing se encuentran en:
@@ -350,7 +339,3 @@ Los escenarios Gherkin que guían la implementación y testing se encuentran en:
 **Metodología**: Cada escenario Gherkin → 1 test unitario NUnit (relación 1:1)
 
 ---
-
-## Próximo Paso
-
-Implementación guiada por TDD basada en especificaciones Gherkin.
