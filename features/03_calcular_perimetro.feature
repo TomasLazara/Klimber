@@ -6,7 +6,7 @@ Feature: Calcular perímetro de formas geométricas
     Then el perímetro es 20
 
   Scenario: Calcular perímetro de círculo
-    Given un Círculo con radio 3
+    Given un Círculo con diámetro 6
     When calculo el perímetro
     Then el perímetro es 18.85
 

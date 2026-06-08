@@ -19,6 +19,35 @@ Este proyecto aplica los siguientes métodos para resolver el desafío de refact
 
 ---
 
+## Compatibilidad con Tests AS-IS
+
+Los 6 tests originales del código AS-IS fueron **actualizados al nuevo diseño TO-BE** manteniendo **expectativas de HTML idénticas**:
+
+### Cambios en los tests (solo API, mismo comportamiento):
+
+**AS-IS (código viejo):**
+```csharp
+new FormaGeometrica(FormaGeometrica.Cuadrado, 5)
+FormaGeometrica.Imprimir(formas, FormaGeometrica.Castellano)
+```
+
+**TO-BE (código refactorizado):**
+```csharp
+new Cuadrado(5)
+new ReporteFormateador().GenerarReporte(formas, Idioma.Castellano)
+```
+
+### HTML generado: IDÉNTICO
+
+El HTML producido es **exactamente el mismo** que el código AS-IS:
+- Mismo formato: `<h1>...</h1>`, `<br/>`, `TOTAL:<br/>`
+- Mismos decimales: coma para castellano/italiano, punto para inglés
+- Mismo orden de formas agrupadas por tipo
+
+**Resultado:** Los 6 tests AS-IS pasan exitosamente con el nuevo diseño. ✅
+
+---
+
 ## Análisis del Estado Actual (AS-IS)
 
 ## 1. Diagnóstico del Problema
@@ -148,14 +177,15 @@ El código actual funciona pero presenta múltiples problemas de diseño que dif
 
 **FormaGeometrica (abstracta)**:
 - Responsabilidad única: Cálculo geométrico
+- Property abstracta: `Nombre` (identifica la forma para traducción)
 - Métodos abstractos: `CalcularArea()`, `CalcularPerimetro()`
 - Sin conocimiento de formateo, idiomas o presentación
 
 **Formas Concretas** (4):
-- `Cuadrado(decimal lado)`
-- `Circulo(decimal radio)`
-- `Triangulo(decimal lado)`
-- `Trapecio(decimal baseMayor, decimal baseMenor, decimal altura)` - Isósceles
+- `Cuadrado(decimal lado)` - Nombre: "Cuadrado"
+- `Circulo(decimal diametro)` - Nombre: "Circulo"
+- `Triangulo(decimal lado)` - Nombre: "Triangulo"
+- `Trapecio(decimal baseMayor, decimal baseMenor, decimal altura)` - Nombre: "Trapecio", Isósceles
 
 **ReporteFormateador**:
 - Responsabilidad única: Generación de reportes HTML
@@ -206,12 +236,12 @@ context Cuadrado::Cuadrado(lado: Decimal)
     self.lado = lado
 
 -- Circulo
-context Circulo::Circulo(radio: Decimal)
-  pre radioPositivo:
-    radio > 0
+context Circulo::Circulo(diametro: Decimal)
+  pre diametroPositivo:
+    diametro > 0
 
-  post radioAsignado:
-    self.radio = radio
+  post diametroAsignado:
+    self._diametro = diametro
 
 -- Triangulo
 context Triangulo::Triangulo(lado: Decimal)
@@ -237,6 +267,34 @@ context Trapecio::Trapecio(baseMayor: Decimal, baseMenor: Decimal, altura: Decim
 
   post alturaAsignada:
     self.altura = altura
+```
+
+---
+
+### Property Nombre en FormaGeometrica
+
+```ocl
+-- FormaGeometrica (clase abstracta)
+context FormaGeometrica
+  inv nombreNoNullNiVacio:
+    self.Nombre <> null and self.Nombre.size() > 0
+
+-- Cada clase concreta implementa Nombre como constante
+context Cuadrado
+  inv nombreCorrecto:
+    self.Nombre = "Cuadrado"
+
+context Circulo
+  inv nombreCorrecto:
+    self.Nombre = "Circulo"
+
+context Triangulo
+  inv nombreCorrecto:
+    self.Nombre = "Triangulo"
+
+context Trapecio
+  inv nombreCorrecto:
+    self.Nombre = "Trapecio"
 ```
 
 ---

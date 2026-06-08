@@ -44,8 +44,8 @@ Feature: Generar reporte de formas geométricas
   Scenario: Generar reporte con múltiples tipos de formas en inglés
     Given un Cuadrado con lado 5
     And un Cuadrado con lado 2
-    And un Círculo con radio 3
-    And un Círculo con radio 2.75
+    And un Círculo con diámetro 3
+    And un Círculo con diámetro 2.75
     And un Triángulo con lado 4
     And un Triángulo con lado 9
     And un Triángulo con lado 4.2
@@ -60,8 +60,8 @@ Feature: Generar reporte de formas geométricas
   Scenario: Generar reporte con múltiples tipos de formas en castellano
     Given un Cuadrado con lado 5
     And un Cuadrado con lado 2
-    And un Círculo con radio 3
-    And un Círculo con radio 2.75
+    And un Círculo con diámetro 3
+    And un Círculo con diámetro 2.75
     And un Triángulo con lado 4
     And un Triángulo con lado 9
     And un Triángulo con lado 4.2

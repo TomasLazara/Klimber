@@ -6,7 +6,7 @@ Feature: Calcular área de formas geométricas
     Then el área es 25
 
   Scenario: Calcular área de círculo
-    Given un Círculo con radio 3
+    Given un Círculo con diámetro 6
     When calculo el área
     Then el área es 28.27
 

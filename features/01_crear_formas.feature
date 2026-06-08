@@ -21,23 +21,23 @@ Feature: Crear instancias de formas geométricas
     And el mensaje contiene "lado debe ser mayor a 0"
 
   # Círculo
-  Scenario: Crear círculo con radio válido
-    Given un radio de 3
+  Scenario: Crear círculo con diámetro válido
+    Given un diámetro de 6
     When creo un Círculo
     Then el círculo se crea exitosamente
-    And el radio del círculo es 3
+    And el diámetro del círculo es 6
 
-  Scenario: Crear círculo con radio inválido
-    Given un radio de 0
+  Scenario: Crear círculo con diámetro inválido
+    Given un diámetro de 0
     When intento crear un Círculo
     Then se lanza ArgumentException
-    And el mensaje contiene "radio debe ser mayor a 0"
+    And el mensaje contiene "diámetro debe ser mayor a 0"
 
-  Scenario: Crear círculo con radio negativo
-    Given un radio de -2
+  Scenario: Crear círculo con diámetro negativo
+    Given un diámetro de -2
     When intento crear un Círculo
     Then se lanza ArgumentException
-    And el mensaje contiene "radio debe ser mayor a 0"
+    And el mensaje contiene "diámetro debe ser mayor a 0"
 
   # Triángulo
   Scenario: Crear triángulo con lado válido
