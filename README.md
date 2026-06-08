@@ -3,7 +3,7 @@
 ## Autor
 
 **Tomas Lazara** - Desarrollador Senior
-[tomafelipelazara@gmail.com](mailto:tomafelipelazara@gmail.com) | [GitHub](https://github.com/TomasLazara/Klimber) | [LinkedIn](https://www.linkedin.com/in/tomas-felipe-lazara/)
+[tomafelipelazara@gmail.com](mailto:tomafelipelazara@gmail.com) | [GitHub](https://github.com/TomasLazara/) | [LinkedIn](https://www.linkedin.com/in/tomas-felipe-lazara/)
 
 ---
 
