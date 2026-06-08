@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using DevelopmentChallenge.Data.Enums;
+using DevelopmentChallenge.Data.Helpers;
 
 namespace DevelopmentChallenge.Data.Classes
 {
@@ -35,22 +36,22 @@ namespace DevelopmentChallenge.Data.Classes
                 throw new ArgumentNullException(nameof(formas));
 
             if (!Enum.IsDefined(typeof(Idioma), idioma))
-                throw new ArgumentException($"Idioma inválido: {idioma}", nameof(idioma));
+                throw new ArgumentException(string.Format("Idioma inválido: {0}", idioma), nameof(idioma));
 
-            var cultura = ObtenerCultura(idioma);
+            var cultura = CulturaHelper.ObtenerCultura(idioma);
             var sb = new StringBuilder();
 
             if (!formas.Any())
             {
                 // Lista vacía
                 var mensajeVacio = _traductor.Traducir("ListaVacia", idioma);
-                sb.Append($"<h1>{mensajeVacio}</h1>");
+                sb.Append("<h1>" + mensajeVacio + "</h1>");
             }
             else
             {
                 // Header
                 var header = _traductor.Traducir("ReporteHeader", idioma);
-                sb.Append($"<h1>{header}</h1>");
+                sb.Append("<h1>" + header + "</h1>");
 
                 // Agrupar formas por tipo
                 var grupos = formas
@@ -74,7 +75,7 @@ namespace DevelopmentChallenge.Data.Classes
                     var areaFormateada = grupo.AreaTotal.ToString("#.##", cultura);
                     var perimetroFormateado = grupo.PerimetroTotal.ToString("#.##", cultura);
 
-                    sb.Append($"{grupo.Cantidad} {formaTraducida} | {labelArea} {areaFormateada} | {labelPerimetro} {perimetroFormateado} <br/>");
+                    sb.Append(grupo.Cantidad + " " + formaTraducida + " | " + labelArea + " " + areaFormateada + " | " + labelPerimetro + " " + perimetroFormateado + " <br/>");
                 }
 
                 // Footer - TOTAL
@@ -89,28 +90,10 @@ namespace DevelopmentChallenge.Data.Classes
                 var totalAreaFormateada = totalArea.ToString("#.##", cultura);
                 var totalPerimetroFormateado = totalPerimetro.ToString("#.##", cultura);
 
-                sb.Append($"TOTAL:<br/>{totalFormas} {labelFormas} {labelPerimetroFooter} {totalPerimetroFormateado} {labelAreaFooter} {totalAreaFormateada}");
+                sb.Append("TOTAL:<br/>" + totalFormas + " " + labelFormas + " " + labelPerimetroFooter + " " + totalPerimetroFormateado + " " + labelAreaFooter + " " + totalAreaFormateada);
             }
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Obtiene la cultura correspondiente al idioma para formateo de números.
-        /// </summary>
-        private CultureInfo ObtenerCultura(Idioma idioma)
-        {
-            switch (idioma)
-            {
-                case Idioma.Castellano:
-                    return CultureInfo.GetCultureInfo("es-AR"); // Coma decimal
-                case Idioma.Ingles:
-                    return CultureInfo.GetCultureInfo("en-US"); // Punto decimal
-                case Idioma.Italiano:
-                    return CultureInfo.GetCultureInfo("it-IT"); // Coma decimal
-                default:
-                    return CultureInfo.InvariantCulture;
-            }
         }
     }
 }

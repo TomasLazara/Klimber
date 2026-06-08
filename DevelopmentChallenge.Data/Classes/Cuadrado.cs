@@ -12,7 +12,10 @@ namespace DevelopmentChallenge.Data.Classes
         /// <summary>
         /// Nombre de la forma.
         /// </summary>
-        public override string Nombre => "Cuadrado";
+        public override string Nombre
+        {
+            get { return "Cuadrado"; }
+        }
 
         /// <summary>
         /// Crea un cuadrado con el lado especificado.

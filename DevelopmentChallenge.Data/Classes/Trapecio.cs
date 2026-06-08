@@ -14,7 +14,10 @@ namespace DevelopmentChallenge.Data.Classes
         /// <summary>
         /// Nombre de la forma.
         /// </summary>
-        public override string Nombre => "Trapecio";
+        public override string Nombre
+        {
+            get { return "Trapecio"; }
+        }
 
         /// <summary>
         /// Crea un trapecio isósceles con las dimensiones especificadas.

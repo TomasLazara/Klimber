@@ -12,7 +12,10 @@ namespace DevelopmentChallenge.Data.Classes
         /// <summary>
         /// Nombre de la forma.
         /// </summary>
-        public override string Nombre => "Circulo";
+        public override string Nombre
+        {
+            get { return "Circulo"; }
+        }
 
         /// <summary>
         /// Crea un círculo con el diámetro especificado.

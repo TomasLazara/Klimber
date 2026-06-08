@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Resources;
 using DevelopmentChallenge.Data.Enums;
+using DevelopmentChallenge.Data.Helpers;
 
 namespace DevelopmentChallenge.Data.Classes
 {
@@ -41,7 +42,7 @@ namespace DevelopmentChallenge.Data.Classes
 
             ValidarIdioma(idioma);
 
-            var cultura = ObtenerCultura(idioma);
+            var cultura = CulturaHelper.ObtenerCultura(idioma);
             var traduccion = _resourceManager.GetString(clave, cultura);
 
             // Fallback: si no encuentra traducción, devuelve clave original
@@ -50,11 +51,17 @@ namespace DevelopmentChallenge.Data.Classes
 
         /// <summary>
         /// Traduce el nombre de una forma geométrica con pluralización automática.
+        /// Usa claves estructuradas en resources: {nombreForma}.Singular / {nombreForma}.Plural
         /// </summary>
         /// <param name="nombreForma">Nombre de la forma (ej: "Cuadrado", "Circle")</param>
         /// <param name="cantidad">Cantidad de formas (determina singular/plural)</param>
         /// <param name="idioma">Idioma destino</param>
         /// <returns>Forma traducida en singular o plural según cantidad</returns>
+        /// <remarks>
+        /// Ejemplos de claves en resources:
+        /// - "Cuadrado.Singular" → "Cuadrado" (es), "Square" (en), "Quadrato" (it)
+        /// - "Cuadrado.Plural" → "Cuadrados" (es), "Squares" (en), "Quadrati" (it)
+        /// </remarks>
         public string TraducirForma(string nombreForma, int cantidad, Idioma idioma)
         {
             if (nombreForma == null)
@@ -68,38 +75,13 @@ namespace DevelopmentChallenge.Data.Classes
 
             ValidarIdioma(idioma);
 
-            // Determinar si es singular o plural
-            string clave;
-            if (cantidad == 1)
-            {
-                // Singular: usar nombre directo
-                clave = nombreForma;
-            }
-            else
-            {
-                // Plural: agregar 's' al nombre (ej: "Cuadrado" -> "Cuadrados")
-                clave = nombreForma + "s";
-            }
+            // Construir clave estructurada: NombreForma.Singular o NombreForma.Plural
+            string clave = cantidad == 1
+                ? nombreForma + ".Singular"     // "Circle.Singular"
+                : nombreForma + ".Plural";      // "Circle.Plural"
 
+            // Resources hace TODO: traduce Y pluraliza
             return Traducir(clave, idioma);
-        }
-
-        /// <summary>
-        /// Obtiene la cultura correspondiente al idioma.
-        /// </summary>
-        private CultureInfo ObtenerCultura(Idioma idioma)
-        {
-            switch (idioma)
-            {
-                case Idioma.Castellano:
-                    return CultureInfo.GetCultureInfo("es");
-                case Idioma.Ingles:
-                    return CultureInfo.GetCultureInfo("en");
-                case Idioma.Italiano:
-                    return CultureInfo.GetCultureInfo("it");
-                default:
-                    throw new ArgumentException($"Idioma no soportado: {idioma}", nameof(idioma));
-            }
         }
 
         /// <summary>
@@ -108,7 +90,7 @@ namespace DevelopmentChallenge.Data.Classes
         private void ValidarIdioma(Idioma idioma)
         {
             if (!Enum.IsDefined(typeof(Idioma), idioma))
-                throw new ArgumentException($"Idioma inválido: {idioma}", nameof(idioma));
+                throw new ArgumentException(string.Format("Idioma inválido: {0}", idioma), nameof(idioma));
         }
     }
 }

@@ -12,7 +12,10 @@ namespace DevelopmentChallenge.Data.Classes
         /// <summary>
         /// Nombre de la forma.
         /// </summary>
-        public override string Nombre => "Triangulo";
+        public override string Nombre
+        {
+            get { return "Triangulo"; }
+        }
 
         /// <summary>
         /// Crea un triángulo equilátero con el lado especificado.
