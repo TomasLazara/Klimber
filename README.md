@@ -7,6 +7,19 @@
 
 ---
 
+## Uso de IA
+
+Se trabajó de forma conversacional con **Claude (Anthropic)** con los siguientes objetivos:
+
+- **Determinar el MoSCoW** en primera instancia para priorizar el refactoring
+- **Recorrer la solución existente** iterativamente, analizando el código AS-IS
+- **Traducir de lenguaje coloquial a Gherkin** para definir especificaciones BDD
+- **Delegación parcial de escritura de código** con supervisión constante para reforzar la construcción del "harness" impuesto por el diseño UML+OCL+BDD
+
+La IA actuó como asistente colaborativo, no como reemplazo del trabajo intelectual. Todas las decisiones de arquitectura, diseño y validación fueron supervisadas y aprobadas explícitamente.
+
+---
+
 ## Enfoque Utilizado
 
 Este proyecto aplica los siguientes métodos para resolver el desafío de refactorización:
